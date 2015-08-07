@@ -79,12 +79,22 @@ func (s *StepMountSecondaryDvdImages) mountFiles(vmName string) ([]DvdController
 
 func (s *StepMountSecondaryDvdImages) addAndMountIntegrationServicesSetupDisk(vmName string) (DvdControllerProperties, error) {
 
-	isoPath := os.Getenv("WINDIR") + "\\system32\\vmguest.iso"
-	properties, err := s.addAndMountDvdDisk(vmName, isoPath)
-	if err != nil {
-		return properties, err
+	isoPath := os.Getenv("WINDIR") + "\\system32\\vmguest.iso"	
+	//test to see if the isoPath exists, if not ignore, possibily Windows 10.	
+	
+	var properties DvdControllerProperties
+	
+	if _, err := os.Stat(isoPath); err!= nil {
+		log.Println(fmt.Println(isoPath  + " doesn't exist, skipping"))
+	} else {
+		log.Println(fmt.Println(isoPath  + " exists, mounting"))
+		
+		properties, err := s.addAndMountDvdDisk(vmName, isoPath)
+		if err != nil {
+			return properties, err
+		}
 	}
-
+	
 	return properties, nil
 }
 
